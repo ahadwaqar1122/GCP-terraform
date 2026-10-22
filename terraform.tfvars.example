@@ -1,0 +1,50 @@
+project_id   = "nth-infusion-169309"
+network_name = "lo-prod"
+region       = "europe-west2"
+
+subnets = {
+  lo-prod = {
+    cidr        = "10.210.102.0/24"
+    description = "Laptop Outlet (LO-Prod) production subnet in europe-west2"
+  }
+}
+
+# SSH currently OPEN TO ALL (temporary). Lock down to the VPN range later by
+# setting instance_ssh_source_ranges to the VPN/Tailscale CIDR.
+instance_allow_private_ssh = true
+instance_ssh_source_ranges = ["0.0.0.0/0"]
+instance_enable_os_login   = false
+instance_ssh_username      = "your-username"
+instance_ssh_public_key    = "ssh-ed25519 AAAA... your-username"
+
+# Two managed instance groups: frontend and backend.
+# Instances are private (no public IP); outbound internet via Cloud NAT.
+migs = {
+  lo-frontend-prod = {
+    machine_type      = "e2-standard-2"
+    target_size       = 2
+    boot_disk_size_gb = 30
+    serving_port      = 80
+    health_check_path = "/"
+  }
+  lo-backend-prod = {
+    machine_type      = "e2-standard-4"
+    target_size       = 2
+    boot_disk_size_gb = 30
+    serving_port      = 80
+    health_check_path = "/"
+  }
+}
+
+# External HTTP load balancer: default -> frontend, /api/* -> backend.
+enable_load_balancer = true
+lb_default_backend   = "lo-frontend-prod"
+lb_routing_rules = [
+  {
+    paths   = ["/api", "/api/*"]
+    backend = "lo-backend-prod"
+  }
+]
+
+# Optional standalone VMs (none by default now that MIGs are used).
+instances = {}
