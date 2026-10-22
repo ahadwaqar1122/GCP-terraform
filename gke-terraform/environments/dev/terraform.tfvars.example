@@ -1,0 +1,13 @@
+# Copy to terraform.tfvars and fill in real values. Never commit terraform.tfvars
+# if it contains anything sensitive (it shouldn't for this config, but keep the habit).
+
+project_id = "REPLACE_WITH_YOUR_GCP_PROJECT_ID"
+region     = "us-central1"
+
+# Lock down who can reach the Kubernetes API even though the endpoint is public in dev.
+master_authorized_networks = [
+  {
+    cidr_block   = "203.0.113.0/24"
+    display_name = "office-vpn"
+  }
+]

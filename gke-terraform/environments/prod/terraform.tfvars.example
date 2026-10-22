@@ -1,0 +1,11 @@
+project_id = "REPLACE_WITH_YOUR_GCP_PROJECT_ID"
+region     = "us-central1"
+
+# Required: the endpoint is private, so only these ranges (reachable inside
+# the VPC, e.g. via VPN/Interconnect or a bastion) can reach the API server.
+master_authorized_networks = [
+  {
+    cidr_block   = "10.100.0.0/24"
+    display_name = "vpn-range"
+  }
+]
